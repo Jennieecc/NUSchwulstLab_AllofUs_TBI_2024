@@ -1,0 +1,44 @@
+PCS_patients_PCSinfo <- dataset_91359072_condition_df
+TBI_patients_TBIinfo <- dataset_04921423_condition_df
+TBIpt_bd <- dataset_69900952_person_df
+PCSpt_bd <- dataset_84806307_person_df
+  
+setDT(TBI_patients_TBIinfo)
+TBI_patients_TBIinfo <- TBI_patients_TBIinfo[ order(condition_start_datetime), .SD[1], by = person_id ]
+
+setDT(PCS_patients_PCSinfo)
+PCS_patients_PCSinfo <- PCS_patients_PCSinfo[ order(condition_start_datetime), .SD[1], by = person_id ]
+
+PCS_patients_PCSinfo$dP <- as.Date(substring(PCS_patients_PCSinfo$condition_start_datetime, 1,10), "%Y-%m-%d")
+TBI_patients_TBIinfo$dT <- as.Date(substring(TBI_patients_TBIinfo$condition_start_datetime, 1,10), "%Y-%m-%d")
+TBIpt_bd$dB <- as.Date(substring(TBIpt_bd$date_of_birth, 1,10), "%Y-%m-%d")
+
+dataPCS <- merge(TBI_patients_TBIinfo[, c("person_id", "dT")], PCS_patients_PCSinfo[, c("person_id", "dP")], by = 'person_id')
+dataDoB <- merge(TBI_patients_TBIinfo[, c("person_id", "dT")], TBIpt_bd[, c("person_id", "dB")], by = 'person_id')
+head(data)
+
+
+hist(as.numeric(dataPCS[dP >= dT, difftime(dP, dT, units="days")]))
+plot(ecdf(as.numeric(dataPCS[dP >= dT, difftime(dP, dT, units="days")])))
+abline(v=1825)
+
+plot(ecdf(as.numeric(dataDoB[, difftime(dT, dB, units="weeks")])))
+
+invalid_id <- dataPCS[dP < dT]$person_id
+
+pcs_id <- dataPCS[dP >= dT & difftime(dP, dT, units="days") < 1825]$person_id
+neg_sample_id <- setdiff(TBI_patients_TBIinfo[ dT <= '2019-08-23']$person_id, union(pcs_id, invalid_id))
+
+all_sample_id <- union(pcs_id, neg_sample_id)
+young_id <- dataDoB[ person_id %in% all_sample_id & difftime(dT, dB, units="weeks") < 3380 ]$person_id
+aged_id <- dataDoB[ person_id %in% all_sample_id & difftime(dT, dB, units="weeks") >= 3380 ]$person_id
+
+young_TBI_df <- subset(TBIpt_bd, subset = person_id %in% intersect(young_id, neg_sample_id))
+young_TBI_df$PCS <- 0
+young_PCS_df <- subset(TBIpt_bd, subset = person_id %in% intersect(young_id, pcs_id))
+young_PCS_df$PCS <- 1
+
+aged_TBI_df <- subset(TBIpt_bd, subset = person_id %in% intersect(aged_id, neg_sample_id))
+aged_TBI_df$PCS <- 0
+aged_PCS_df <- subset(TBIpt_bd, subset = person_id %in% intersect(aged_id, pcs_id))
+aged_PCS_df$PCS <- 1
