@@ -1,0 +1,271 @@
+library(data.table)
+set.seed(42)
+df_young <- read.csv('df_young_raw_090524.csv')
+df_young <- as.data.table(df_young)
+table(df_young_raw$PCS)
+#   0    1 
+# 3212  338 
+
+dup_ids <- df_young[ duplicated(df_young$person_id), person_id ]
+#no dup
+
+table(df_young$Sex_at_birth)
+# Female   Male 
+#   2161   1389 
+
+# Split the data into two data frames: df_final1 (70%) and df_final2 (30%)
+df_young1 <- df_young %>%
+  group_by(Sex_at_birth) %>%
+  sample_frac(0.7) %>%
+  ungroup()
+table(df_young1$Sex_at_birth)
+#Female   Male 
+# 1513    972 
+
+#Data exploration - correlation analysis
+library(hablar)
+df_young1$Dizzinee_giddiness <- NULL
+
+{
+  df_young1<-df_young1 %>%
+    mutate(
+      Sex_at_birth = recode_factor(Sex_at_birth, 'Male' = 0, 'Female' = 1)
+    )%>% convert(num(Sex_at_birth))
+  df_numeric <- df_young1
+  
+  numeric_columns <- df_numeric[sapply(df_numeric, is.numeric)]
+  cor_matrix <- cor(numeric_columns)
+  cor_matrix
+  col = colorRampPalette(c("blue", "white", "red"))(100)
+  heatmap(cor_matrix, 
+          col = col, 
+         # Define color palette
+         )
+  legend(x="left", legend=c("min", "med", "max"),fill=c("blue", "white", "red"))
+  
+}
+#the groups below are related:
+#anxiety&depression
+#dyperlipidemia and hypertension
+df_young$Dizzinee_giddiness <- NULL
+df_young$TP53_pro72arg <- NULL
+df_young$Dementia <- NULL
+#df_young$Chronic_pain <- NULL
+#df_young$Hyperlipidemia <- NULL
+
+set.seed(42)
+df_young1 <- df_young %>%
+  group_by(Sex_at_birth) %>%
+  sample_frac(0.7) %>%
+  ungroup()
+
+df_young2 <- df_young %>%
+  anti_join(df_young1, by = "person_id")  
+# Define your train_data and test_data (assuming you've already loaded and prepared your data)
+df_split <- df_young1 %>%
+  group_by(Sex_at_birth) %>%
+  sample_frac(0.7) %>%
+  ungroup()
+
+train_data_raw <- df_young1 %>%
+  semi_join(df_split, by = "person_id") %>%
+  mutate(
+    Sex_at_birth = recode_factor(Sex_at_birth, 'Male' = 0, 'Female' = 1)
+  ) %>% convert(num(Sex_at_birth)) %>% convert(fct(PCS))
+
+test_data_raw <- df_young1 %>%
+  anti_join(train_data_raw, by = "person_id")%>%
+  mutate(
+    Sex_at_birth = recode_factor(Sex_at_birth, 'Male' = 0, 'Female' = 1)
+  )%>% convert(num(Sex_at_birth))%>% convert(fct(PCS))
+
+train_data <- train_data_raw %>%
+  select(-person_id)
+
+test_data <- test_data_raw %>%
+  select(-person_id)
+
+#col_names <- setdiff(names(train_data), c("PCS", "person_id"))
+#for (i in 1:length(col_names)) {
+#  for (j in (i+1):length(col_names)) {
+#    if (j==14) break
+#    my_col1 = col_names[i]
+#    my_col2 = col_names[j]
+#    train_data[[paste(my_col1,"_",my_col2,sep="")]] <- train_data[[my_col1]] * train_data[[my_col2]]
+#    test_data[[paste(my_col1,"_",my_col2,sep="")]] <- test_data[[my_col1]] * test_data[[my_col2]]
+#  }
+#}
+
+# Select numeric columns for normalization:
+numeric_columns <- sapply(train_data, is.numeric)
+
+library(caret)
+# Create a preProcess object for normalization:
+preproc <- preProcess(train_data[, numeric_columns], method = c("center", "scale"))
+
+# Apply the same transformation to both training and testing data:
+train_data[, numeric_columns] <- predict(preproc, train_data[, numeric_columns])
+test_data[, numeric_columns] <- predict(preproc, test_data[, numeric_columns])
+
+# Build a logistic regression model:
+w0 = sum(train_data$PCS==1) / nrow(train_data)
+w1 = sum(train_data$PCS==0)  / nrow(train_data)
+weights = ifelse(train_data$PCS==0, w0, w1)
+
+# Build a logistic regression model glm:
+{
+  model <- glm(PCS ~ ., data = train_data, family = binomial(link = "logit"), weights = weights)
+  #model <- glm(PCS ~ gender +Headache+ Sleep_disorders_Apoe4, data = train_data, family = binomial(link = "logit"), weights = weights)
+  y_predict <- predict(model, newdata = test_data, type = "response")
+  
+  # Calculate the accuracy of the model on the test set:
+  threshold <- 0.5  # You can choose a different threshold if needed
+  predicted_classes <- ifelse(y_predict > threshold, 1, 0)
+  actual_classes <- test_data$PCS
+  accuracy <- sum(predicted_classes == actual_classes) / length(actual_classes)
+  print(paste("Accuracy:", accuracy))
+  #"Accuracy: 0.663538873994638"
+  coefficients <- coef(model)
+  # Create a data frame to display the coefficients
+  coefficients_df <- data.frame(
+    coefficients
+  )
+  
+  # Print the coefficients data frame
+  coefficients_df
+  #evaluate performance
+  conf_matrix <- table(actual_classes, predicted_classes)
+  conf_matrix
+  #                predicted_classes
+  # actual_classes   0   1
+  #             0   461 224
+  #             1    27  34
+  
+  # Calculate accuracy
+  accuracy <- sum(predicted_classes == actual_classes) / length(actual_classes)
+  print(paste("Accuracy for test set is:", round(accuracy, 4)))
+  #"Accuracy for test set is: 0.6635"
+  # Calculate precision
+  precision <- sum(predicted_classes == 1 & actual_classes == 1) / sum(predicted_classes == 1)
+  print(paste("Precision for test set is:", round(precision, 4)))
+  
+  # Calculate recall
+  recall <- sum(predicted_classes == 1 & actual_classes == 1) / sum(actual_classes == 1)
+  print(paste("Recall for test set is:", round(recall, 4)))
+  
+  library(pROC) # library already imported at the beginning of notebook
+  # Calculate ROC curve
+  roc_curve <- roc(response = actual_classes, predictor = y_predict)
+  
+  # Plot ROC curve
+  plot(roc_curve)
+  
+  # Calculate AUC
+  auc <- auc(roc_curve)
+  print(paste("AUC:", auc))
+  # "AUC: 0.637286107454828""
+  
+  saveRDS(list(model, preproc), file = "pcsModel09052024.young.rds")
+  #######################################################################################################################################
+  #######################################################################################################################################
+  ######################################################Pt2: out of sample#################################################################################
+  #######################################################################################################################################
+  #######################################################################################################################################
+  # Load the logistic regression model, means, and standard deviations from the file
+  loaded_objects <- readRDS("pcsModel09052024.young.rds")
+  
+  # Extract the objects
+  loaded_model <- loaded_objects[[1]]
+  loaded_preproc <- loaded_objects[[2]]
+  
+  y_test <- test_data[["PCS"]]
+  
+  #How to do out-of-sample prediction using the saved model
+  #use df_young2
+  table(df_young2$Sex_at_birth)
+  #Female   Male 
+  # 648    417 
+  
+  test_data_raw <- df_young2 %>%
+    mutate(
+      Sex_at_birth = recode_factor(Sex_at_birth, 'Male' = 0, 'Female' = 1)
+    )%>% convert(num(Sex_at_birth))%>% convert(fct(PCS))
+  
+  test_data <- test_data_raw %>%
+    select(-person_id)
+  
+  # Select numeric columns for normalization:
+  numeric_columns <- sapply(test_data, is.numeric)
+  numeric_columns <- setdiff(names(test_data)[sapply(test_data, is.numeric)], 'PCS')
+  
+  # Create a preProcess object for normalization:
+  test_data[, numeric_columns] <- predict(loaded_preproc, test_data[, ..numeric_columns])
+  
+  # Make predictions
+  predictions <- predict(model, newdata = test_data, type = "response")
+  
+  # Threshold for classification (you can choose a different threshold if needed)
+  threshold <- 0.5
+  
+  # Convert predicted probabilities to binary classes
+  predicted_classes <- ifelse(predictions > threshold, 1, 0)
+  
+  # Actual classes
+  actual_classes <- test_data$PCS
+  
+  # Calculate accuracy
+  accuracy <- sum(predicted_classes == actual_classes) / length(actual_classes)
+  
+  # Print accuracy
+  print(paste("Accuracy:", accuracy))
+  # Accuracy: 0.646009389671361
+  # Calculate ROC curve
+  roc_curve <- roc(response = actual_classes, predictor = predictions)
+  
+  # Plot ROC curve
+  plot(roc_curve)
+  
+  # Calculate AUC
+  auc <- auc(roc_curve)
+  print(paste("AUC:", auc))
+  #"AUC: 0.663458724367354"
+}
+
+library(dominanceanalysis)
+library(ggpubr)
+#dominance analysis
+da<-dominanceAnalysis(model)
+print(da)
+summary(da)
+plot(da)
+#calculate ORs and CIs
+young_OR=cbind(exp(coef(model)), 	exp(summary(model)$coefficients[,1] - 1.96*summary(model)$coefficients[,2]), 	exp(summary(model)$coefficients[,1] + 1.96*summary(model)$coefficients[,2]) )
+young_OR<-data.frame(young_OR)
+young_OR$V4=rownames(young_OR)
+#visualize
+
+# Create labels for plot
+boxLabels = as.character(rev(c("Sex_at_birth_F", "Anxiety", "Depression", "Hypertension", "Sleep_disorders", "Electrolyte_disorders","Type_1_Diabetes", "Type_2_Diabetes", "Heart_disease",
+              "Hyperlipidemia","Chronic_pain","Headache","Chest_pain","Lower_backpain","Alcohol_use","COMT_val158met","BDNF_val66met","Apoe4","Apoe2")))
+boxLabels <- factor(boxLabels, levels=unique(boxLabels))
+df <- data.frame(yAxis = length(boxLabels):1, 
+                 boxOdds = rev(c( 1.2651645, 1.0443562, 0.8940126,1.1016210,1.187357,0.8929587,1.0644514,0.8257512,0.8446574, 
+                              1.121039,1.67242,1.363341,1.126752,0.8636244,0.9999996,0.8654799,1.300167,0.8996698,0.9423685)), 
+                 boxCILow = rev(c(0.9684707, 0.7726977,0.6607379, 0.8251313, 0.8908417,0.6786694,0.8415424,0.6243204,0.6339235,
+                              0.8380641,1.232082,1.033977,0.8338987,0.6471429,0.7739894,0.6699229,1.001081,0.6958481,0.7235654)), 
+                 boxCIHigh = rev(c(1.6527515,1.4115219,1.2096453,1.4707586,1.582568,1.1749097,1.3464048,1.0921717,1.125445,
+                               1.499562,2.270132,1.79762,1.522451,1.1525231,292006,1.118122,1.688609,1.163193,1.227337))
+)
+
+
+ggplot(df, aes(x = boxOdds, y = boxLabels)) +
+  geom_vline(aes(xintercept = 1), size = .25, linetype = 'dashed') +
+  geom_errorbarh(aes(xmax = boxCIHigh, xmin = boxCILow), size =0.5, height = .5, color = 'grey') +
+  geom_point(size = 3, color = 'black') +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),panel.grid.major = element_blank()) +
+  scale_x_continuous(breaks = seq(0.5, 2.5, 0.5), labels = seq(0.5, 2.5, 0.5),limits = c(0.5, 2.5) ) +
+  ylab('') +
+  xlab('Odds ratio') +
+  theme(text = element_text(size = 15)) 
+
