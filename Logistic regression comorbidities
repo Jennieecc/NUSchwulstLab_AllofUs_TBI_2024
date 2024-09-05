@@ -1,0 +1,604 @@
+############################################################YoungerGroup:18-65##############################################
+{
+df_young_raw <- rbind(young_TBI_df, young_PCS_df)
+# Remove the 'gender' and 'race' column
+#df_young_raw <- select(df_young_raw,-race)
+df_young_raw <- select(df_young_raw,person_id,sex_at_birth, PCS)
+
+###Anxiety
+# This query represents dataset "anxiety" for domain "person" and was generated for All of Us Controlled Tier Dataset v7
+# ...
+#dataset_anxiety<-dataset_25583963_person_df
+#write.csv(dataset_anxiety,"Comorbidity_anxiety_090524.csv", row.names = FALSE)
+
+common <- intersect(df_young_raw$person_id, dataset_anxiety$person_id)  
+dataset_anxiety_1<-filter(dataset_anxiety, person_id%in%common)
+df_young_raw$Anxiety <- ifelse(df_young_raw$person_id %in% dataset_anxiety_1$person_id, 1, 0)
+table(df_young_raw$Anxiety,df_young_raw$PCS)
+
+#     0    1
+# 0 1675  127
+# 1 1537  211
+
+#######Chronic pain
+# This query represents dataset "anxiety" for domain "person" and was generated for All of Us Controlled Tier Dataset v7
+# ...
+#dataset_chronicpain<-dataset_96676775_person_df
+#write.csv(dataset_chronicpain,"Comorbidity_chronic pain_090524.csv", row.names = FALSE)
+common <- intersect(df_young_raw$person_id, dataset_chronicpain$person_id)  
+dataset_chronicpain_1<-filter(dataset_chronicpain, person_id%in%common)
+df_young_raw$Chronic_pain <- ifelse(df_young_raw$person_id %in% dataset_chronicpain_1$person_id, 1, 0)
+table(df_young_raw$Chronic_pain,df_young_raw$PCS)
+#     0    1
+# 0 1834  120
+# # 1 1378  218
+
+####Hypertension
+# ...
+#dataset_hypertension<-dataset_71907803_person_df
+#write.csv(dataset_hypertension,"Comorbidity_hypertension_090524.csv", row.names = FALSE)
+common <- intersect(df_young_raw$person_id, dataset_hypertension$person_id)  
+dataset_hypertension_1<-filter(dataset_hypertension, person_id%in%common)
+df_young_raw$Hypertension <- ifelse(df_young_raw$person_id %in% dataset_hypertension_1$person_id, 1, 0)
+table(df_young_raw$Hypertension,df_young_raw$PCS)
+
+#     0    1
+# 0 1764  142
+# 1 1448  196
+
+####Sleep disorders
+#dataset_sleepdisorders<-dataset_59975160_person_df
+#write.csv(dataset_sleepdisorders,"Comorbidity_sleepdisorders_090524.csv", row.names = FALSE)
+common <- intersect(df_young_raw$person_id, dataset_sleepdisorders$person_id)  
+dataset_sleepdisorders_1<-filter(dataset_sleepdisorders, person_id%in%common)
+df_young_raw$Sleep_disorders <- ifelse(df_young_raw$person_id %in% dataset_sleepdisorders_1$person_id, 1, 0)
+table(df_young_raw$Sleep_disorders,df_young_raw$PCS)
+#     0    1
+# 0 1911  150
+# 1 1301  188
+
+#####Type1 diabetes
+{#dataset_t1bd<-dataset_42051895_person_df
+  common <- intersect(df_young_raw$person_id, dataset_t1bd$person_id)  
+  dataset_t1bd_1<-filter(dataset_t1bd, person_id%in%common)
+  df_young_raw$Type_1_Diabetes<- ifelse(df_young_raw$person_id %in% dataset_t1bd_1$person_id, 1, 0)
+  table(df_young_raw$Type_1_Diabetes,df_young_raw$PCS)
+  #     0    1
+  # 0 3105  322
+  # 1  107   16
+
+}
+#########Type2 diabetes
+#dataset_t2bd<-dataset_32220512_person_df
+#write.csv(dataset_t2bd,"Comorbidity_t2bd_090524.csv", row.names = FALSE)
+common <- intersect(df_young_raw$person_id, dataset_t2bd$person_id)  
+dataset_t2bd_1<-filter(dataset_t2bd, person_id%in%common)
+df_young_raw$Type_2_Diabetes<- ifelse(df_young_raw$person_id %in% dataset_t2bd_1$person_id, 1, 0)
+table(df_young_raw$Type_2_Diabetes,df_young_raw$PCS)
+#     0    1
+# 0 2591  262
+# 1  621   76
+
+#########Dementia
+#dataset_dimentia<-dataset_64313580_person_df
+#write.csv(dataset_dimentia,"Comorbidity_dementia_090524.csv", row.names = FALSE)
+common <- intersect(df_young_raw$person_id, dataset_dimentia$person_id)  
+dataset_dimentia_1<-filter(dataset_dimentia, person_id%in%common)
+df_young_raw$Dementia<- ifelse(df_young_raw$person_id %in% dataset_dimentia_1$person_id, 1, 0)
+table(df_young_raw$Dementia,df_young_raw$PCS)
+
+#      0    1
+# 0 2995    0
+# 1  217  338
+
+##########Depression
+#dataset_depression<-dataset_91843421_person_df
+#write.csv(dataset_depression,"Comorbidity_depression_090524.csv", row.names = FALSE)
+common <- intersect(df_young_raw$person_id, dataset_depression$person_id)  
+dataset_depression_1<-filter(dataset_depression, person_id%in%common)
+df_young_raw$Depression<- ifelse(df_young_raw$person_id %in% dataset_depression_1$person_id, 1, 0)
+table(df_young_raw$Depression,df_young_raw$PCS)
+#     0    1
+# 0 1559  114
+# 1 1653  224
+
+##########Heart disease
+{#dataset_heartdisease<-dataset_95459196_person_df
+  common <- intersect(df_young_raw$person_id, dataset_heartdisease$person_id)  
+  dataset_heartdisease_1<-filter(dataset_heartdisease, person_id%in%common)
+  df_young_raw$Heart_disease<- ifelse(df_young_raw$person_id %in% dataset_heartdisease_1$person_id, 1, 0)
+  table(df_young_raw$Heart_disease,df_young_raw$PCS)
+  #     0    1
+  # 0 2055  183
+  # 1 1157  155
+}
+
+##########APOE4 allele
+#dataset_apoe4<-dataset_16154206_person_df
+#write.csv(dataset_apoe4,"Apoe4_081224.csv", row.names = FALSE)
+
+common <- intersect(df_young_raw$person_id, dataset_apoe4$person_id)  
+dataset_apoe4_1<-filter(dataset_apoe4, person_id%in%common)
+df_young_raw$Apoe4<- ifelse(df_young_raw$person_id %in% dataset_apoe4_1$person_id, 1, 0)
+table(df_young_raw$Apoe4,df_young_raw$PCS)
+
+#     0    1
+# 0 2566  278
+# 1  646   60
+
+##########APOE2 allele
+#dataset_apoe2<-dataset_83627385_person_df
+#write.csv(dataset_apoe2,"Apoe2_081224.csv", row.names = FALSE)
+common <- intersect(df_young_raw$person_id, dataset_apoe2$person_id)  
+dataset_apoe2_1<-filter(dataset_apoe2, person_id%in%common)
+df_young_raw$Apoe2<- ifelse(df_young_raw$person_id %in% dataset_apoe2_1$person_id, 1, 0)
+table(df_young_raw$Apoe2,df_young_raw$PCS)
+
+#     0    1
+# 0 2851  309
+# 1  361   29
+
+##########hyperlipidemia
+#dataset_hyperlipidemia<-dataset_97592955_person_df
+#write.csv(dataset_hyperlipidemia,"Comorbidity_hyperlipidemia_090524.csv", row.names = FALSE)
+#dataset_hyperlipidemia <- read.csv("Comorbidity_hyperlipidemia_081224.csv")
+common <- intersect(df_young_raw$person_id, dataset_hyperlipidemia$person_id)  
+dataset_hyperlipidemia_1<-filter(dataset_hyperlipidemia, person_id%in%common)
+df_young_raw$Hyperlipidemia<- ifelse(df_young_raw$person_id %in% dataset_hyperlipidemia_1$person_id, 1, 0)
+table(df_young_raw$Hyperlipidemia,df_young_raw$PCS)
+#     0    1
+# 0 1974  160
+# 1 1238  178
+
+#headache
+#dataset_headache<-dataset_11545640_person_df
+#write.csv(dataset_headache,"Comorbidity_headache_090524.csv", row.names = FALSE)
+common <- intersect(df_young_raw$person_id, dataset_headache$person_id)  
+dataset_headache_1<-filter(dataset_headache, person_id%in%common)
+df_young_raw$Headache<- ifelse(df_young_raw$person_id %in% dataset_headache_1$person_id, 1, 0)
+table(df_young_raw$Headache,df_young_raw$PCS)
+#     0    1
+# 0 1500   73
+# 1 1712  265
+
+#chestpain
+#dataset_chestpain <-dataset_52645008_person_df
+#write.csv(dataset_chestpain,"Comorbidity_dataset_chestpain_090524.csv", row.names = FALSE)
+common <- intersect(df_young_raw$person_id, dataset_chestpain$person_id)  
+dataset_chestpain_1<-filter(dataset_chestpain, person_id%in%common)
+df_young_raw$Chestpain<- ifelse(df_young_raw$person_id %in% dataset_chestpain_1$person_id, 1, 0)
+table(df_young_raw$Chestpain,df_young_raw$PCS)
+#     0    1
+# 0 1478  100
+# 1 1734  238
+
+#lowerbackpain
+#dataset_lowerbackpain <-dataset_49507561_person_df
+#write.csv(dataset_lowerbackpain,"Comorbidity_dataset_lowerbackpain_090524.csv", row.names = FALSE)
+common <- intersect(df_young_raw$person_id, dataset_lowerbackpain$person_id)  
+dataset_lowerbackpain_1<-filter(dataset_lowerbackpain, person_id%in%common)
+df_young_raw$Lowerbackpain<- ifelse(df_young_raw$person_id %in% dataset_lowerbackpain_1$person_id, 1, 0)
+table(df_young_raw$Lowerbackpain,df_young_raw$PCS)
+#     0    1
+# 0 1822  149
+# 1 1390  189
+
+#alcohol use
+#for questions in the survey on a typical day when you drink, how many drinks do you have?
+lifestyle(code=1586198)
+
+download_data <- function(query){
+  tb <- bq_project_query(Sys.getenv('GOOGLE_PROJECT'), query)
+  bq_table_download(tb,bigint = "integer64")
+}
+DATASET <- Sys.getenv('WORKSPACE_CDR')
+DATASET
+
+query  <- str_glue("
+SELECT distinct person_id,question, question_concept_id,answer
+FROM `{DATASET}.ds_survey` 
+WHERE question_concept_id in (1586207)
+
+-- lower(question) like '%diabetes currently%' 
+-- AND lower(question) not like '%pre%' 
+ORDER BY person_id
+")
+df1 = download_data(query)
+head(df1)
+df1$question_concept_id<-NULL
+df1$question<-NULL
+df1<-df1 %>% filter (!answer %in% c("PMI: Skip", "PMI: Prefer Not To Answer"))
+df1 <- df1 %>%
+  mutate(
+    answer = recode_factor(answer, 'Average Daily Drink Count: 1 or 2' = 1, 
+                           'Average Daily Drink Count: 3 or 4' = 2,
+                           'Average Daily Drink Count: 5 or 6' = 3,
+                           'Average Daily Drink Count: 7 to 9' = 4,
+                           'Average Daily Drink Count: 10 or More' = 5)
+  ) %>% convert(num(answer)) %>% convert(num(person_id))
+#write.csv(df1,"alcohol_survey_081424.csv", row.names = FALSE)
+
+common <- intersect(df_young_raw$person_id, df1$person_id)  
+
+dataset_alcohol_1<-filter(df1, person_id%in%common)
+
+dataset_alcohol_1$Alcohol_use <- dataset_alcohol_1$answer
+df_young_raw <- merge(df_young_raw, dataset_alcohol_1[, c("person_id", "Alcohol_use")], by='person_id', all.x=T)
+df_young_raw$Alcohol_use <- ifelse(is.na(df_young_raw$Alcohol_use), 0, df_young_raw$Alcohol_use)
+
+#df_young_raw$Alcoholuse<- ifelse(df_young_raw$person_id %in% dataset_alcohol_1$person_id, dataset_alcohol_1$answer, 0)
+table(df_young_raw$Alcohol_use,df_young_raw$PCS)
+#     0     1
+# 0 1014  110
+# 1 1518  169
+# 2  468   38
+# 3  129    9
+# 4   40    8
+# 5   43    4
+
+#COMT val158met
+#dataset_COMT <- dataset_20045045_person_df
+#write.csv(dataset_COMT,"COMT_val158met_081424.csv", row.names = FALSE)
+#dataset_COMT <- read.csv("COMT_val158met_081424.csv")
+common <- intersect(df_young_raw$person_id, dataset_COMT$person_id)  
+dataset_COMT_1<-filter(dataset_COMT, person_id%in%common)
+df_young_raw$COMT_val158met<- ifelse(df_young_raw$person_id %in% dataset_COMT_1$person_id, 1, 0)
+table(df_young_raw$COMT_val158met,df_young_raw$PCS)
+#     0    1
+# 0 1683  183
+# 1 1529  155
+
+#TP53 pro72arg
+#dataset_TP53 <- dataset_96015946_person_df
+#write.csv(dataset_TP53,"TP53_pro72arg_081424.csv", row.names = FALSE)
+#dataset_TP53 <- read.csv("TP53_pro72arg_081424.csv")
+common <- intersect(df_young_raw$person_id, dataset_TP53$person_id)  
+dataset_TP53_1<-filter(dataset_TP53, person_id%in%common)
+df_young_raw$TP53_pro72arg<- ifelse(df_young_raw$person_id %in% dataset_TP53_1$person_id, 1, 0)
+table(df_young_raw$TP53_pro72arg,df_young_raw$PCS)
+#     0    1
+# 0 1322  138
+# 1 1890  200
+
+#BDNF val66met
+#dataset_BDNF <- dataset_93595713_person_df
+#write.csv(dataset_BDNF,"BDNF_val66met_081424.csv", row.names = FALSE)
+#dataset_BDNF <- read.csv("BDNF_val66met_081424.csv")
+common <- intersect(df_young_raw$person_id, dataset_BDNF$person_id)  
+dataset_BDNF_1<-filter(dataset_BDNF, person_id%in%common)
+df_young_raw$BDNF_val66met<- ifelse(df_young_raw$person_id %in% dataset_BDNF_1$person_id, 1, 0)
+table(df_young_raw$BDNF_val66met,df_young_raw$PCS)
+#     0    1
+# 0 2005  136
+# 1 1207  202
+
+#dizziness and giddiness
+#dataset_dizziness_giddiness<-dataset_10954300_person_df
+#write.csv(dataset_dizziness_giddiness,"dataset_dizziness_giddiness_090524.csv", row.names = FALSE)
+#dataset_dizziness_giddiness <- read.csv("dataset_dizziness_giddiness_081524.csv")
+common <- intersect(df_young_raw$person_id, dataset_dizziness_giddiness$person_id)  
+dataset_dizziness_giddiness_1<-filter(dataset_dizziness_giddiness, person_id%in%common)
+df_young_raw$Dizzinee_giddiness<- ifelse(df_young_raw$person_id %in% dataset_dizziness_giddiness_1$person_id, 1, 0)
+table(df_young_raw$dizzinee_giddiness,df_young_raw$PCS)
+#     0    1
+# 0 2065  135
+# 1 1147  203
+
+#electrolyte disorders
+#dataset_electrolyte_disorders<-dataset_09980443_person_df
+#write.csv(dataset_electrolyte_disorders,"dataset_electrolyte_disorders_090524.csv", row.names = FALSE)
+#dataset_electrolyte_disorders <- read.csv("dataset_electrolyte_disorders_081524.csv")
+common <- intersect(df_young_raw$person_id, dataset_electrolyte_disorders$person_id)  
+dataset_electrolyte_disorders_1<-filter(dataset_electrolyte_disorders, person_id%in%common)
+df_young_raw$Electrolyte_disorders<- ifelse(df_young_raw$person_id %in% dataset_electrolyte_disorders_1$person_id, 1, 0)
+table(df_young_raw$Electrolyte_disorders,df_young_raw$PCS)
+#     0    1
+# 0 2248  228
+# 1  964  110
+
+write.csv(df_young_raw,"df_young_raw_090524.csv", row.names = FALSE)
+
+}
+############################################################OlderGroup:>65##############################################
+{
+df_aged_raw <- rbind(aged_TBI_df, aged_PCS_df)
+# Remove the 'race' column
+df_aged_raw <- select(df_aged_raw,person_id,sex_at_birth, PCS)
+
+###Anxiety
+# This query represents dataset "anxiety" for domain "person" and was generated for All of Us Controlled Tier Dataset v7
+# ...
+#dataset_anxiety<-dataset_67753744_person_df
+#write.csv(dataset_anxiety,"Comorbidity_anxiety_082324.csv", row.names = FALSE)
+
+common <- intersect(df_aged_raw$person_id, dataset_anxiety$person_id)  
+#a<-unique(df_aged_raw$person_id)#a=2207 overlapped=2483-2207=276
+dataset_anxiety_1<-filter(dataset_anxiety, person_id%in%common)
+df_aged_raw$Anxiety <- ifelse(df_aged_raw$person_id %in% dataset_anxiety_1$person_id, 1, 0)
+table(df_aged_raw$Anxiety,df_aged_raw$PCS)
+
+#   0   1
+# 0 336  50
+# 1 239  40
+
+#######Chronic pain
+# This query represents dataset "anxiety" for domain "person" and was generated for All of Us Controlled Tier Dataset v7
+# ...
+#dataset_chronicpain<-dataset_32069764_person_df
+#write.csv(dataset_chronicpain,"Comorbidity_chronic pain_082324.csv", row.names = FALSE)
+common <- intersect(df_aged_raw$person_id, dataset_chronicpain$person_id)  
+dataset_chronicpain_1<-filter(dataset_chronicpain, person_id%in%common)
+df_aged_raw$Chronic_pain <- ifelse(df_aged_raw$person_id %in% dataset_chronicpain_1$person_id, 1, 0)
+table(df_aged_raw$Chronic_pain,df_aged_raw$PCS)
+#     0   1
+# 0 261  43
+# 1 314  47
+
+####Hypertension
+# ...
+#dataset_hypertension<-dataset_29152100_person_df
+#write.csv(dataset_hypertension,"Comorbidity_hypertension_082324.csv", row.names = FALSE)
+common <- intersect(df_aged_raw$person_id, dataset_hypertension$person_id)  
+dataset_hypertension_1<-filter(dataset_hypertension, person_id%in%common)
+df_aged_raw$Hypertension <- ifelse(df_aged_raw$person_id %in% dataset_hypertension_1$person_id, 1, 0)
+table(df_aged_raw$Hypertension,df_aged_raw$PCS)
+
+#     0   1
+# 0 141  29
+# 1 434  61
+
+####Sleep disorders
+#dataset_sleepdisorders<-dataset_24446416_person_df
+#write.csv(dataset_sleepdisorders,"Comorbidity_sleepdisorders_082324.csv", row.names = FALSE)
+common <- intersect(df_aged_raw$person_id, dataset_sleepdisorders$person_id)  
+dataset_sleepdisorders_1<-filter(dataset_sleepdisorders, person_id%in%common)
+df_aged_raw$Sleep_disorders <- ifelse(df_aged_raw$person_id %in% dataset_sleepdisorders_1$person_id, 1, 0)
+table(df_aged_raw$Sleep_disorders,df_aged_raw$PCS)
+#     0   1
+# 0 268  43
+# 1 307  47
+
+#####Type1 diabetes
+#dataset_t1bd<-dataset_87847506_person_df
+common <- intersect(df_aged_raw$person_id, dataset_t1bd$person_id)  
+dataset_t1bd_1<-filter(dataset_t1bd, person_id%in%common)
+df_aged_raw$Type_1_Diabetes<- ifelse(df_aged_raw$person_id %in% dataset_t1bd_1$person_id, 1, 0)
+table(df_aged_raw$Type_1_Diabetes,df_aged_raw$PCS)
+#     0   1
+# 0 567  87
+# 1   8   3
+
+#########Type2 diabetes
+#dataset_t2bd<-dataset_73563157_person_df
+#write.csv(dataset_t2bd,"Comorbidity_t2bd_082324.csv", row.names = FALSE)
+common <- intersect(df_aged_raw$person_id, dataset_t2bd$person_id)  
+dataset_t2bd_1<-filter(dataset_t2bd, person_id%in%common)
+df_aged_raw$Type_2_Diabetes<- ifelse(df_aged_raw$person_id %in% dataset_t2bd_1$person_id, 1, 0)
+table(df_aged_raw$Type_2_Diabetes,df_aged_raw$PCS)
+
+#     0   1
+# 0 406  60
+# 1 169  30
+
+{#########Dementia
+#dataset_dimentia<-dataset_22724020_person_df
+#write.csv(dataset_dimentia,"Comorbidity_dementia_081224.csv", row.names = FALSE)
+common <- intersect(df_aged_raw$person_id, dataset_dimentia$person_id)  
+dataset_dimentia_1<-filter(dataset_dimentia, person_id%in%common)
+df_aged_raw$Dementia<- ifelse(df_aged_raw$person_id %in% dataset_dimentia_1$person_id, 1, 0)
+table(df_aged_raw$Dementia,df_aged_raw$PCS)
+
+#     0   1
+# 0 542  87
+# 1  33   3
+}
+
+##########Depression
+#dataset_depression<-dataset_42630617_person_df
+#write.csv(dataset_depression,"Comorbidity_depression_082324.csv", row.names = FALSE)
+common <- intersect(df_aged_raw$person_id, dataset_depression$person_id)  
+dataset_depression_1<-filter(dataset_depression, person_id%in%common)
+df_aged_raw$Depression<- ifelse(df_aged_raw$person_id %in% dataset_depression_1$person_id, 1, 0)
+table(df_aged_raw$Depression,df_aged_raw$PCS)
+
+#     0   1
+# 0 327  54
+# 1 248  36
+
+##########Heart disease
+#dataset_heartdisease<-dataset_09074734_person_df
+#common <- intersect(df_aged_raw$person_id, dataset_heartdisease$person_id)  
+dataset_heartdisease_1<-filter(dataset_heartdisease, person_id%in%common)
+df_aged_raw$Heart_disease<- ifelse(df_aged_raw$person_id %in% dataset_heartdisease_1$person_id, 1, 0)
+table(df_aged_raw$Heart_disease,df_aged_raw$PCS)
+#     0   1
+# 0 390  64
+# 1 185  26
+
+##########APOE4 allele
+#dataset_apoe4<-dataset_16154206_person_df
+#write.csv(dataset_apoe4,"Apoe4_081224.csv", row.names = FALSE)
+
+common <- intersect(df_aged_raw$person_id, dataset_apoe4$person_id)  
+dataset_apoe4_1<-filter(dataset_apoe4, person_id%in%common)
+df_aged_raw$Apoe4<- ifelse(df_aged_raw$person_id %in% dataset_apoe4_1$person_id, 1, 0)
+table(df_aged_raw$Apoe4,df_aged_raw$PCS)
+
+#    0   1
+# 0 495  66
+# 1  80  24
+
+##########APOE2 allele
+#dataset_apoe2<-dataset_95061753_person_df
+#write.csv(dataset_apoe2,"Apoe2_081224.csv", row.names = FALSE)
+common <- intersect(df_aged_raw$person_id, dataset_apoe2$person_id)  
+dataset_apoe2_1<-filter(dataset_apoe2, person_id%in%common)
+df_aged_raw$Apoe2<- ifelse(df_aged_raw$person_id %in% dataset_apoe2_1$person_id, 1, 0)
+table(df_aged_raw$Apoe2,df_aged_raw$PCS)
+
+#    0   1
+# 0 514  82
+# 1  61   8
+
+##########hyperlipidemia
+# dataset_hyperlipidemia<-dataset_70430145_person_df
+#  write.csv(dataset_hyperlipidemia,"Comobodity_hyperlipidemia_082324.csv", row.names = FALSE)
+ common <- intersect(df_aged_raw$person_id, dataset_hyperlipidemia$person_id)  
+dataset_hyperlipidemia_1<-filter(dataset_hyperlipidemia, person_id%in%common)
+df_aged_raw$Hyperlipidemia<- ifelse(df_aged_raw$person_id %in% dataset_hyperlipidemia_1$person_id, 1, 0)
+table(df_aged_raw$Hyperlipidemia,df_aged_raw$PCS)
+# 0   1
+# 0 115  29
+# 1 460  61
+
+#headache
+# dataset_headache<-dataset_98493466_person_df
+# write.csv(dataset_headache,"Comobodity_headache_082324.csv", row.names = FALSE)
+# dataset_headache <- read.csv("Comorbidity_dataset_headache_081224.csv")
+common <- intersect(df_aged_raw$person_id, dataset_headache$person_id)  
+dataset_headache_1<-filter(dataset_headache, person_id%in%common)
+df_aged_raw$Headache<- ifelse(df_aged_raw$person_id %in% dataset_headache_1$person_id, 1, 0)
+table(df_aged_raw$Headache,df_aged_raw$PCS)
+#   0   1
+# 0 354  43
+# 1 221  47
+
+#chestpain
+# dataset_chestpain <-dataset_29146227_person_df
+# write.csv(dataset_chestpain,"Comorbidity_dataset_chestpain_082324.csv", row.names = FALSE)
+common <- intersect(df_aged_raw$person_id, dataset_chestpain$person_id)  
+dataset_chestpain_1<-filter(dataset_chestpain, person_id%in%common)
+df_aged_raw$Chest_pain<- ifelse(df_aged_raw$person_id %in% dataset_chestpain_1$person_id, 1, 0)
+table(df_aged_raw$Chest_pain,df_aged_raw$PCS)
+#     0   1
+# 0 260  41
+# 1 315  49
+
+#lowerbackpain
+# dataset_lowerbackpain <-dataset_64769116_person_df
+# write.csv(dataset_lowerbackpain,"Comorbidity_dataset_lowerbackpain_082324.csv", row.names = FALSE)
+common <- intersect(df_aged_raw$person_id, dataset_lowerbackpain$person_id)  
+dataset_lowerbackpain_1<-filter(dataset_lowerbackpain, person_id%in%common)
+df_aged_raw$Lower_backpain<- ifelse(df_aged_raw$person_id %in% dataset_lowerbackpain_1$person_id, 1, 0)
+table(df_aged_raw$Lower_backpain,df_aged_raw$PCS)
+#     0   1
+# 0 312  59
+# 1 263  31
+
+#alcohol use
+lifestyle(code=1586198)
+
+download_data <- function(query){
+  tb <- bq_project_query(Sys.getenv('GOOGLE_PROJECT'), query)
+  bq_table_download(tb,bigint = "integer64")
+}
+DATASET <- Sys.getenv('WORKSPACE_CDR')
+DATASET
+
+query  <- str_glue("
+SELECT distinct person_id,question, question_concept_id,answer
+FROM `{DATASET}.ds_survey` 
+WHERE question_concept_id in (1586207)
+
+-- lower(question) like '%diabetes currently%' 
+-- AND lower(question) not like '%pre%' 
+ORDER BY person_id
+")
+df1 = download_data(query)
+head(df1)
+df1$question_concept_id<-NULL
+df1$question<-NULL
+df1<-df1 %>% filter (!answer %in% c("PMI: Skip", "PMI: Prefer Not To Answer"))
+df1 <- df1 %>%
+  mutate(
+    answer = recode_factor(answer, 'Average Daily Drink Count: 1 or 2' = 1, 
+                           'Average Daily Drink Count: 3 or 4' = 2,
+                           'Average Daily Drink Count: 5 or 6' = 3,
+                           'Average Daily Drink Count: 7 to 9' = 4,
+                           'Average Daily Drink Count: 10 or More' = 5)
+  ) %>% convert(num(answer)) %>% convert(num(person_id))
+#write.csv(df1,"alcohol_survey_081424.csv", row.names = FALSE)
+
+common <- intersect(df_aged_raw$person_id, df1$person_id)  
+
+dataset_alcohol_1<-filter(df1, person_id%in%common)
+
+dataset_alcohol_1$Alcohol_use <- dataset_alcohol_1$answer
+# df_aged_raw$Alcoholuse <- NULL
+df_aged_raw <- merge(df_aged_raw, dataset_alcohol_1[, c("person_id", "Alcohol_use")], by='person_id', all.x=T)
+df_aged_raw$Alcohol_use <- ifelse(is.na(df_aged_raw$Alcohol_use), 0, df_aged_raw$Alcohol_use)
+
+##df_aged_raw$Alcoholuse<- ifelse(df_aged_raw$person_id %in% dataset_alcohol_1$person_id, dataset_alcohol_1$answer, 0)
+
+table(df_aged_raw$Alcohol_use,df_aged_raw$PCS)
+#     0   1
+# 0 186  43
+# 1 359  42
+# 2  24   2
+# 3   5   2
+# 5   1   1
+
+#COMT val158met
+#dataset_COMT <- dataset_20045045_person_df
+#write.csv(dataset_COMT,"COMT_val158met_081424.csv", row.names = FALSE)
+#dataset_COMT <- read.csv("COMT_val158met_081424.csv")
+common <- intersect(df_aged_raw$person_id, dataset_COMT$person_id)  
+dataset_COMT_1<-filter(dataset_COMT, person_id%in%common)
+df_aged_raw$COMT_val158met<- ifelse(df_aged_raw$person_id %in% dataset_COMT_1$person_id, 1, 0)
+table(df_aged_raw$COMT_val158met,df_aged_raw$PCS)
+#    0   1
+# 0 274  47
+# 1 301  43
+
+#TP53 pro72arg
+#dataset_TP53 <- dataset_96015946_person_df
+#write.csv(dataset_TP53,"TP53_pro72arg_081424.csv", row.names = FALSE)
+#dataset_TP53 <- read.csv("TP53_pro72arg_081424.csv")
+common <- intersect(df_aged_raw$person_id, dataset_TP53$person_id)  
+dataset_TP53_1<-filter(dataset_TP53, person_id%in%common)
+df_aged_raw$TP53_pro72arg<- ifelse(df_aged_raw$person_id %in% dataset_TP53_1$person_id, 1, 0)
+table(df_aged_raw$TP53_pro72arg,df_aged_raw$PCS)
+#     0   1
+# 0 206  34
+# 1 369  56
+
+#BDNF val66met
+#dataset_BDNF <- dataset_93595713_person_df
+#write.csv(dataset_BDNF,"BDNF_val66met_081424.csv", row.names = FALSE)
+#dataset_BDNF <- read.csv("BDNF_val66met_081424.csv")
+common <- intersect(df_aged_raw$person_id, dataset_BDNF$person_id)  
+dataset_BDNF_1<-filter(dataset_BDNF, person_id%in%common)
+df_aged_raw$BDNF_val66met<- ifelse(df_aged_raw$person_id %in% dataset_BDNF_1$person_id, 1, 0)
+table(df_aged_raw$BDNF_val66met,df_aged_raw$PCS)
+#    0   1
+# 0 302  41
+# 1 273  49
+
+#dizziness and giddiness
+# dataset_dizziness_giddiness<-dataset_30099217_person_df
+# write.csv(dataset_dizziness_giddiness,"dataset_dizziness_giddiness_082324.csv", row.names = FALSE)
+#dataset_dizziness_giddiness <- read.csv("dataset_dizziness_giddiness_081524.csv")
+common <- intersect(df_aged_raw$person_id, dataset_dizziness_giddiness$person_id)  
+dataset_dizziness_giddiness_1<-filter(dataset_dizziness_giddiness, person_id%in%common)
+df_aged_raw$Dizzinee_giddiness<- ifelse(df_aged_raw$person_id %in% dataset_dizziness_giddiness_1$person_id, 1, 0)
+table(df_aged_raw$Dizzinee_giddiness,df_aged_raw$PCS)
+#     0   1
+# 0 302  41
+# 1 273  49
+
+#electrolyte disorders
+# dataset_electrolyte_disorders<-dataset_77875741_person_df
+# write.csv(dataset_electrolyte_disorders,"dataset_electrolyte_disorders_082324.csv", row.names = FALSE)
+#dataset_electrolyte_disorders <- read.csv("dataset_electrolyte_disorders_081524.csv")
+common <- intersect(df_aged_raw$person_id, dataset_electrolyte_disorders$person_id)  
+dataset_electrolyte_disorders_1<-filter(dataset_electrolyte_disorders, person_id%in%common)
+df_aged_raw$Electrolyte_disorders<- ifelse(df_aged_raw$person_id %in% dataset_electrolyte_disorders_1$person_id, 1, 0)
+table(df_aged_raw$Electrolyte_disorders,df_aged_raw$PCS)
+#     0   1
+# 0 360  59
+# 1 215  31
+
+write.csv(df_aged_raw,"df_aged_raw_090524.csv", row.names = FALSE)
+#drop out T1 diabetes and heart disease to avoid multicollinearity 
+#df_aged <- select(df_aged,-Type_1_Diabetes,-Heart_disease)
+}
